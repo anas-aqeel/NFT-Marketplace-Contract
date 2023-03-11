@@ -72,9 +72,8 @@ contract MyMarketplace {
             IERC721(_nftContract).getApproved(_tokenId) == address(this),
             "NFT is not approved to this contract"
         );
-        if (_ERC20Contract != address(0)) {
-            require(_price > 0, "price should be greater than 0");
-        }
+
+        require(_price > 0, "price should be greater than 0");
 
         marketNFTs[_nftContract][_tokenId] = SaleItem(
             _tokenId, // nft token id
