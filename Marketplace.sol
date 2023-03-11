@@ -26,7 +26,7 @@ contract MyMarketplace {
         uint256 _askingPrice,
         address _nftContract,
         address _ERC20Contract
-    ) public payable {
+    ) public {
         require(
             IERC721(_nftContract).ownerOf(_tokenId) == msg.sender,
             "Only owner can list NFT"
@@ -35,15 +35,13 @@ contract MyMarketplace {
             IERC721(_nftContract).getApproved(_tokenId) == address(this),
             "NFT is not approved to this contract"
         );
-        if (_ERC20Contract == address(0)) {
-            require(msg.value > 0, "Asking price should be greater than 0");
-        } else {
+        require(_askingPrice > 0, "Asking price should be greater than 0");
+        if (_ERC20Contract != address(0)) {
             require(
                 IERC20(_ERC20Contract).allowance(msg.sender, address(this)) >=
                     _askingPrice,
                 "Not enough tokens approved"
             );
-            require(_askingPrice > 0, "Asking price should be greater than 0");
         }
 
         marketNFTs[_nftContract][_tokenId] = SaleItem(
@@ -64,7 +62,7 @@ contract MyMarketplace {
         uint256 _price,
         address _nftContract,
         address _ERC20Contract
-    ) public payable {
+    ) public {
         require(
             IERC721(_nftContract).ownerOf(_tokenId) == msg.sender,
             "Only owner can list NFT"
@@ -73,9 +71,8 @@ contract MyMarketplace {
             IERC721(_nftContract).getApproved(_tokenId) == address(this),
             "NFT is not approved to this contract"
         );
-        if (_ERC20Contract == address(0)) {
-            require(msg.value > 0, "Asking price should be greater than 0");
-        } else {
+        if (_ERC20Contract != address(0)) {
+        
             require(_price > 0, "price should be greater than 0");
             require(
                 IERC20(_ERC20Contract).allowance(msg.sender, address(this)) >=
