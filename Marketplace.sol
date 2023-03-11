@@ -169,7 +169,6 @@ contract MyMarketplace {
                 "Amount should be equal price"
             );
         } else {
-            require(msg.value == amount, "Amount should be equal price");
             require(
                 IERC20(_ERC20Contract).allowance(msg.sender, address(this)) >=
                     amount,
