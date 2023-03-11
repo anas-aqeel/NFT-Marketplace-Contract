@@ -101,6 +101,7 @@ contract MyMarketplace {
     ) public payable {
         SaleItem memory NftToBid = marketNFTs[_nftContract][_nftId];
         require(NftToBid.nftContract != address(0), "Invalid NFT");
+        require(NftToBid.sellerAddr != msg.sender, "Owner cannot placed Bid");
         require(NftToBid.isAuction, "Not for auction");
         require(
             (msg.value >= NftToBid.askingPrice &&
@@ -186,21 +187,20 @@ contract MyMarketplace {
     function endAuction(
         address _nftContract,
         uint256 _nftId,
-        address _ERC20Contract,
-        uint256 amount,
-        address highestBidder,
-        address sellerAddr
-    ) public {
-        require(msg.sender == sellerAddr, "Only seller can end Auction");
+        address _ERC20Contract
 
-        if (highestBidder != address(0)) {
+    ) public {
+        SaleItem memory NftToBid = marketNFTs[_nftContract][_nftId];
+        require(msg.sender == NftToBid.sellerAddr, "Only seller can end Auction");
+
+        if (NftToBid.highestBidder != address(0)) {
             // transfer amount to seller
-            refund(amount, highestBidder, _ERC20Contract, sellerAddr);
+            refund(NftToBid.highestBid, NftToBid.highestBidder, NftToBid.ERC20Contract, NftToBid.sellerAddr);
 
             // transfer nft to highestBidder
             IERC721(_nftContract).transferFrom(
-                sellerAddr,
-                highestBidder,
+                NftToBid.sellerAddr,
+                NftToBid.highestBidder,
                 _nftId
             );
         }
