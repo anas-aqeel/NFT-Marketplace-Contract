@@ -40,13 +40,7 @@ contract MyMarketplace {
             "NFT is not approved to this contract"
         );
         require(_askingPrice > 0, "Asking price should be greater than 0");
-        if (_ERC20Contract != address(0)) {
-            require(
-                IERC20(_ERC20Contract).allowance(msg.sender, address(this)) >=
-                    _askingPrice,
-                "Not enough tokens approved"
-            );
-        }
+        
 
         marketNFTs[_nftContract][_tokenId] = SaleItem(
             _tokenId, // nft token id
@@ -82,11 +76,7 @@ contract MyMarketplace {
         if (_ERC20Contract != address(0)) {
         
             require(_price > 0, "price should be greater than 0");
-            require(
-                IERC20(_ERC20Contract).allowance(msg.sender, address(this)) >=
-                    _price,
-                "Not enough tokens approved"
-            );
+           
         }
 
         marketNFTs[_nftContract][_tokenId] = SaleItem(
