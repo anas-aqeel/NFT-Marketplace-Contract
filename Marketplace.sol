@@ -32,6 +32,10 @@ contract MyMarketplace {
             "Only owner can list NFT"
         );
         require(
+           marketNFTs[_nftContract][_tokenId].nftContract == address(0),
+            "Already listed"
+        );
+        require(
             IERC721(_nftContract).getApproved(_tokenId) == address(this),
             "NFT is not approved to this contract"
         );
@@ -66,6 +70,10 @@ contract MyMarketplace {
         require(
             IERC721(_nftContract).ownerOf(_tokenId) == msg.sender,
             "Only owner can list NFT"
+        );
+        require(
+           marketNFTs[_nftContract][_tokenId].nftContract == address(0),
+            "Already listed"
         );
         require(
             IERC721(_nftContract).getApproved(_tokenId) == address(this),
@@ -168,6 +176,17 @@ contract MyMarketplace {
                 "Not Enough tokens approved"
             );
         }
+
+            // transfer amount to seller
+            refund(msg.value, msg.sender, NftToBid.ERC20Contract, NftToBid.sellerAddr);
+
+            // transfer nft to highestBidder
+            IERC721(_nftContract).transferFrom(
+                NftToBid.sellerAddr,
+                NftToBid.highestBidder,
+                _nftId
+            );
+        
         delete marketNFTs[_nftContract][_nftId];
     }
 
