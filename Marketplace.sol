@@ -182,7 +182,7 @@ contract MyMarketplace {
             // transfer nft to highestBidder
             IERC721(_nftContract).transferFrom(
                 NftToBid.sellerAddr,
-                NftToBid.highestBidder,
+                msg.sender,
                 _nftId
             );
         
