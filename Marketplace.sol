@@ -32,7 +32,7 @@ contract MyMarketplace {
             "Only owner can list NFT"
         );
         require(
-           marketNFTs[_nftContract][_tokenId].nftContract == address(0),
+            marketNFTs[_nftContract][_tokenId].nftContract == address(0),
             "Already listed"
         );
         require(
@@ -40,7 +40,6 @@ contract MyMarketplace {
             "NFT is not approved to this contract"
         );
         require(_askingPrice > 0, "Asking price should be greater than 0");
-        
 
         marketNFTs[_nftContract][_tokenId] = SaleItem(
             _tokenId, // nft token id
@@ -66,7 +65,7 @@ contract MyMarketplace {
             "Only owner can list NFT"
         );
         require(
-           marketNFTs[_nftContract][_tokenId].nftContract == address(0),
+            marketNFTs[_nftContract][_tokenId].nftContract == address(0),
             "Already listed"
         );
         require(
@@ -74,9 +73,7 @@ contract MyMarketplace {
             "NFT is not approved to this contract"
         );
         if (_ERC20Contract != address(0)) {
-        
             require(_price > 0, "price should be greater than 0");
-           
         }
 
         marketNFTs[_nftContract][_tokenId] = SaleItem(
@@ -133,12 +130,14 @@ contract MyMarketplace {
                 ) >= amount,
                 "Not Enough tokens approved"
             );
-            refund(
-                NftToBid.highestBid,
-                NftToBid.sellerAddr,
-                NftToBid.ERC20Contract,
-                NftToBid.highestBidder
-            );
+            if (NftToBid.highestBid > 0) {
+                refund(
+                    NftToBid.highestBid,
+                    address(this),
+                    NftToBid.ERC20Contract,
+                    NftToBid.highestBidder
+                );
+            }
             marketNFTs[_nftContract][_nftId].highestBid = amount;
         }
         marketNFTs[_nftContract][_nftId].highestBidder = msg.sender;
@@ -166,16 +165,21 @@ contract MyMarketplace {
             );
         }
 
-            // transfer amount to seller
-            refund(msg.value, msg.sender, NftToBid.ERC20Contract, NftToBid.sellerAddr);
+        // transfer amount to seller
+        refund(
+            msg.value,
+            msg.sender,
+            NftToBid.ERC20Contract,
+            NftToBid.sellerAddr
+        );
 
-            // transfer nft to highestBidder
-            IERC721(_nftContract).transferFrom(
-                NftToBid.sellerAddr,
-                msg.sender,
-                _nftId
-            );
-        
+        // transfer nft to highestBidder
+        IERC721(_nftContract).transferFrom(
+            NftToBid.sellerAddr,
+            msg.sender,
+            _nftId
+        );
+
         delete marketNFTs[_nftContract][_nftId];
     }
 
@@ -196,14 +200,21 @@ contract MyMarketplace {
         address _nftContract,
         uint256 _nftId,
         address _ERC20Contract
-
     ) public {
         SaleItem memory NftToBid = marketNFTs[_nftContract][_nftId];
-        require(msg.sender == NftToBid.sellerAddr, "Only seller can end Auction");
+        require(
+            msg.sender == NftToBid.sellerAddr,
+            "Only seller can end Auction"
+        );
 
         if (NftToBid.highestBidder != address(0)) {
             // transfer amount to seller
-            refund(NftToBid.highestBid, NftToBid.highestBidder, NftToBid.ERC20Contract, NftToBid.sellerAddr);
+            refund(
+                NftToBid.highestBid,
+                NftToBid.highestBidder,
+                NftToBid.ERC20Contract,
+                NftToBid.sellerAddr
+            );
 
             // transfer nft to highestBidder
             IERC721(_nftContract).transferFrom(
